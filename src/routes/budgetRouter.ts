@@ -26,6 +26,7 @@ router.get('/:id',
 
 router.put('/:id', 
     validateBudgetId,
+    validateBudgetExists,
     body('name')
         .notEmpty().withMessage('El nombre del presupuesto no puede ir vacío'),
     handleInputErrors,    
@@ -38,7 +39,8 @@ router.put('/:id',
 )
 
 router.delete('/:id', 
-    validateBudgetId,    
+    validateBudgetId,
+    validateBudgetExists,    
     BudgetController.deleteById
 )
 
