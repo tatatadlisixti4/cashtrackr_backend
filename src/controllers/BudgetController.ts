@@ -3,7 +3,6 @@ import Budget from '../models/Budget'
 
 export class BudgetController {
     static getAll = async (req: Request, res: Response) => {
-        console.log('oliwis getall get')
         try {
             const budgets = await Budget.findAll({
                 order: [
@@ -18,39 +17,22 @@ export class BudgetController {
     }
 
     static create = async (req: Request, res: Response) => {
-        console.log('oliwis create post')
         try {
             const budget = new Budget(req.body)
             await budget.save()
             res.status(200).json('Presupuesto creado correctamente')
         } catch (error) {
-            // console.log(error)
             res.status(500).json({error: 'Hubo un errorsinho'})
         }
     }
 
     static getById = async (req: Request, res: Response) => {
-        console.log('oliwis id getbyid get')
-        const {id} = req.params
-        try {
-            console.log(id)
-            const budget = await Budget.findByPk(id)
-            if(!budget) {
-                const error = new Error('Presupuesto no existe')
-                res.status(404).json({error: error.message})
-                return
-            }
-            res.json(budget)
-        } catch (error) {
-            res.status(500).json({error: 'Hubo un error'})
-        }
+        res.json(req.budget)
     }
 
     static updateById = async (req: Request, res: Response) => {
-        console.log('oliwis id updatebyid put')
-        const {id} = req.params
         try {
-            console.log(id)
+            const {id} = req.params
             const budget = await Budget.findByPk(id)
             if(!budget) {
                 const error = new Error('Presupuesto no existe')
@@ -65,7 +47,6 @@ export class BudgetController {
     }
 
     static deleteById = async (req: Request, res: Response) => {
-        console.log('oliwis id deletebyid delete')
         const {id} = req.params
         const budget = await Budget.findByPk(id)
         if(!budget) {
