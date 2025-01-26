@@ -23,7 +23,21 @@ router.get('/:id',
     handleInputErrors,
     BudgetController.getById
 )
-router.put('/:id', BudgetController.updateById)
+router.put('/:id', 
+    param('id')
+        .isInt().withMessage('ID no válido')
+        .custom(value =>  value > 0).withMessage('ID no válido'),
+        body('name')
+        .notEmpty().withMessage('El nombre del presupuesto no puede ir vacío'),
+    handleInputErrors,    
+    body('amount')
+        .notEmpty().withMessage('La cantidad del presupuesto no puede ir vacía')
+        .isNumeric().withMessage('Cantidad no válida')
+        .custom(value =>  value > 0).withMessage('El presupuesto deber ser mayor a 0'),
+    handleInputErrors,    
+    BudgetController.updateById
+)
+
 router.delete('/:id', BudgetController.deleteById)
 
 export default router
