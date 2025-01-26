@@ -4,6 +4,17 @@ import Budget from '../models/Budget'
 export class BudgetController {
     static getAll = async (req: Request, res: Response) => {
         console.log('oliwis getall get')
+        try {
+            const budgets = await Budget.findAll({
+                order: [
+                    ['createdAt', 'DESC']
+                ],
+                // TODO: Filtrar por el usuario
+            })
+            res.json(budgets)
+        } catch (error) {
+            res.status(500).json({error: 'Hubo uin error'})
+        }
     }
 
     static create = async (req: Request, res: Response) => {
