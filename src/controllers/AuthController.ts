@@ -19,13 +19,12 @@ export class AuthController {
             const user = new User(req.body)
             user.password = await hashPassword(password)
             user.token = generateToken()
-            // await user.save()
+            await user.save()
             await AuthEmail.sendConfirmationEmail({
                 name: user.name,
                 email: user.email,
                 token: user.token
             })
-            return
             res.json('Usuario creado con éxito')
         } catch (error) {
             res.status(500).json({error: 'Hubo un error'})
