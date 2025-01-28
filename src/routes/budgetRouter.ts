@@ -4,13 +4,16 @@ import {BudgetController} from '../controllers/BudgetController'
 import {ExpensesController} from '../controllers/ExpenseController'
 import {handleInputErrors} from '../middleware/validation'
 import {validateBudgetExists, validateBudgetId, validateBudgetInput} from '../middleware/budget'
-import {validateExpenseInput} from '../middleware/expense'
+import {validateExpenseId, validateExpenseInput} from '../middleware/expense'
 
 const router = Router()
 
-/** Routes for budget */
 router.param('budgetId', validateBudgetId)
 router.param('budgetId', validateBudgetExists)
+
+router.param('expenseId', validateExpenseId)
+
+/** Routes for budget */
 router.get('/', BudgetController.getAll)
 router.post('/', 
     validateBudgetInput,
