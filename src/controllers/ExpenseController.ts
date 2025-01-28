@@ -14,14 +14,20 @@ export class ExpensesController {
     }
 
     static getById = async (req: Request, res: Response) => {
-    
+        res.json(req.expense)
     }
 
     static updateById = async (req: Request, res: Response) => {
-    
+        // await req.expense.update(req.body)
+        const {expense} = req
+        await expense.update(req.body)
+        res.json('Gasto actualizado correctamente')
     }
 
     static deleteById = async (req: Request, res: Response) => {
-    
+        // await req.expense.destroy()
+        const {expense} = req
+        await expense.destroy()
+        res.json('Gasto eliminado correctamente')
     }
 }

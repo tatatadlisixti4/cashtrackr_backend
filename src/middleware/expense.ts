@@ -10,7 +10,6 @@ declare global {
     }
 }
 
-
 export const validateExpenseInput = async (req: Request, res: Response, next: NextFunction) => {
     await body('name')
         .notEmpty().withMessage('El nombre del gasto no puede ir vacío')
