@@ -4,6 +4,7 @@ import {BudgetController} from '../controllers/BudgetController'
 import {ExpensesController} from '../controllers/ExpenseController'
 import {handleInputErrors} from '../middleware/validation'
 import {validateBudgetExists, validateBudgetId, validateBudgetInput} from '../middleware/budget'
+import {validateExpenseInput} from '../middleware/expense'
 
 const router = Router()
 
@@ -25,8 +26,11 @@ router.put('/:budgetId',
 router.delete('/:budgetId', BudgetController.deleteById)
 
 /** Router for expenses */
-router.get('/:budgetId/expenses', ExpensesController.getAll)
-router.post('/:budgetId/expenses', ExpensesController.create)
+router.post('/:budgetId/expenses', 
+    validateExpenseInput,
+    handleInputErrors,
+    ExpensesController.create
+)
 router.get('/:budgetId/expenses/:expenseId', ExpensesController.getById)
 router.put('/:budgetId/expenses/:expenseId', ExpensesController.updateById)
 router.delete('/:budgetId/expenses/:expenseId', ExpensesController.deleteById)

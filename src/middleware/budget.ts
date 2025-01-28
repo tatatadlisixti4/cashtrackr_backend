@@ -22,6 +22,7 @@ export const validateBudgetId = async (req: Request, res: Response, next: NextFu
     }
     next()
 }
+
 export const validateBudgetExists = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const {budgetId} = req.params
@@ -37,6 +38,7 @@ export const validateBudgetExists = async (req: Request, res: Response, next: Ne
         res.status(500).json({error: 'Hubo un error'})
     }
 }
+
 export const validateBudgetInput = async (req: Request, res: Response, next: NextFunction) => {
     await body('name')
         .notEmpty().withMessage('El nombre del presupuesto no puede ir vacío')
