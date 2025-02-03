@@ -29,6 +29,10 @@ export class AuthController {
         } catch (error) {
             res.status(500).json({error: 'Hubo un error'})
         }
+    }
 
+    static confirmAccount = async (req: Request, res: Response) => {
+        console.log('Desde confirmaccount')
     }
 }
+
