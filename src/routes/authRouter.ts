@@ -2,6 +2,7 @@ import {Router} from 'express'
 import {body} from 'express-validator'
 import {AuthController} from '../controllers/AuthController'
 import {handleInputErrors} from '../middleware/validation'
+import {limiter} from '../config/limiter'
 
 const router = Router()
 
@@ -17,6 +18,7 @@ router.post('/create-account',
 )
 
 router.post('/confirm-account', 
+    limiter,
     body('token')
         .notEmpty().withMessage('El token no puede ir vacío')
         .isLength({min: 6, max: 6}).withMessage('Token no válido'),
