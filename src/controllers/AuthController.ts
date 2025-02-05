@@ -8,13 +8,11 @@ export class AuthController {
     static createAccount = async (req: Request, res: Response) => {
         const {email, password} = req.body
         const userExist = await User.findOne({where: {email}})
-        
         if(userExist) {
             const error = new Error('El usuario ya existe')
             res.status(409).json({error: error.message})
             return
         }
-
         try {
             const user = new User(req.body)
             user.password = await hashPassword(password)
@@ -42,8 +40,11 @@ export class AuthController {
         user.confirmed = true 
         user.token = null
         await user.save()
-
         res.json("Cuenta confirmada correctamente")
+    }
+
+    static login = async (req: Request, res: Response) => {
+        
     }
 }
 
