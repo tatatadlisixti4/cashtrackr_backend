@@ -60,7 +60,7 @@ export class AuthController {
         const isPasswordCorrect =  await checkPassword(password, user.password)
         if(!isPasswordCorrect) {
             const error = new Error('Password incorrecto')
-            res.status(401).json({error: error.message})
+            res.status(404).json({error: error.message})
             return
         }
         const token = generateJWT(user.id)
@@ -68,8 +68,21 @@ export class AuthController {
     }
 
     static forgotPassword = async (req: Request, res: Response) => {
-        console.log('sadasd')
-        
+        const {email} = req.body
+        const user = await User.findOne({where: {email}})
+        if(!user) {
+            const error = new Error('Usuario no encontrado')
+            res.status(409).json({error: error.message})
+            return
+        }
+        user.token = generateToken()
+        await user.save()
+        await AuthEmail.sendPasswordResetToken({
+            name: user.name, 
+            email: user.email, 
+            token: user.token
+        })
+        res.json('Revisa tu email y sigue las instrucciones')
     }
 }
 

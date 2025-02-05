@@ -30,4 +30,5 @@ export class ExpensesController {
         await expense.destroy()
         res.json('Gasto eliminado correctamente')
     }
+
 }
