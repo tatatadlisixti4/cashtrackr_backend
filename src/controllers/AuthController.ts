@@ -72,7 +72,7 @@ export class AuthController {
         const user = await User.findOne({where: {email}})
         if(!user) {
             const error = new Error('Usuario no encontrado')
-            res.status(409).json({error: error.message})
+            res.status(404).json({error: error.message})
             return
         }
         user.token = generateToken()
@@ -83,6 +83,16 @@ export class AuthController {
             token: user.token
         })
         res.json('Revisa tu email y sigue las instrucciones')
+    }
+
+    static validateToken = async (req: Request, res: Response) => {
+        const {token} = req.body
+        const isTokenCorrect = await User.findOne({where: {token}})
+        if(!isTokenCorrect) {
+            const error = new Error('Token no válido')
+            res.status(404).json({'error': error.message})
+        }
+        res.json('Token válido')
     }
 }
 
