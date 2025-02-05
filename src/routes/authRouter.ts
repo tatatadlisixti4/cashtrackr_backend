@@ -6,6 +6,8 @@ import {limiter} from '../config/limiter'
 
 const router = Router()
 
+router.use(limiter)
+
 router.post('/create-account', 
     body('name')
         .notEmpty().withMessage('EL nombre no puede ir vacío'),
@@ -17,8 +19,7 @@ router.post('/create-account',
     AuthController.createAccount
 )
 
-router.post('/confirm-account', 
-    limiter,
+router.post('/confirm-account',
     body('token')
         .notEmpty().withMessage('El token no puede ir vacío')
         .isLength({min: 6, max: 6}).withMessage('Token no válido'),
@@ -35,4 +36,10 @@ router.post('/login',
     AuthController.login  
 )
 
+router.post('/forgot-password', 
+    body('email')
+        .isEmail().withMessage('Email no válido'),
+    handleInputErrors,
+    AuthController.forgotPassword
+)
 export default router

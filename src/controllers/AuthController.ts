@@ -66,5 +66,10 @@ export class AuthController {
         const token = generateJWT(user.id)
         res.json(token)
     }
+
+    static forgotPassword = async (req: Request, res: Response) => {
+        console.log('sadasd')
+        
+    }
 }
 
