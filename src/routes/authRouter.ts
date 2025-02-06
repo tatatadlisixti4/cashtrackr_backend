@@ -76,4 +76,5 @@ router.post('/update-password',
     handleInputErrors,
     AuthController.updateCurrentUserPassword
 )
+
 export default router
