@@ -31,7 +31,9 @@ export class BudgetController {
     }
 
     static getById = async (req: Request, res: Response) => {
-        const budget = await Budget.findByPk(req.budget.id, {include: [Expense]})
+        const budget = await Budget.findByPk(req.budget.id, {
+            include: [Expense]
+        })
         res.json(budget)
     }
 

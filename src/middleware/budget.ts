@@ -50,3 +50,15 @@ export const validateBudgetInput = async (req: Request, res: Response, next: Nex
         .run(req) 
     next()
 }
+
+export const hasAccess = (req: Request, res: Response, next: NextFunction) => {
+    if(req.user.id !== req.budget.userId) {
+        const error = new Error('Acción no válida para este usuario')
+        res.status(401).json({error: error.message})
+        return
+    }
+    next()
+}
+
+
+
