@@ -24,7 +24,7 @@ export const budgets = [
                 "updatedAt": "2030-06-17T17:21:03.077Z",
             },
             {
-                "id": 3,
+                "id": 3, 
                 "name": "Viaje",
                 "amount": 200,
                 "budgetId": 1,
