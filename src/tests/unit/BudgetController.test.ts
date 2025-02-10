@@ -15,7 +15,8 @@ describe('BudgetController.getAll', () => {
             return Promise.resolve(updatedBudgets)
         })
     })
-    it('should retrive 2 budgets for user with ID 1', async () => {
+
+    it('should retrive 2 budgets for user with ID 1', async() => {
         const req = createRequest({
             user: {id: 1}
         })
@@ -26,7 +27,8 @@ describe('BudgetController.getAll', () => {
         expect(res.statusCode).toBe(200)
         expect(res.statusCode).not.toBe(404)
     })
-    it('should retrive 1 budget for user with ID 2', async () => {
+
+    it('should retrive 1 budget for user with ID 2', async() => {
         const req = createRequest({
             user: {id: 2}
         })
@@ -36,5 +38,16 @@ describe('BudgetController.getAll', () => {
         expect(data).toHaveLength(1)
         expect(res.statusCode).toBe(200)
         expect(res.statusCode).not.toBe(404)
+    })
+    
+    it('should handle errors when fetching budgets', async() => {
+        const req = createRequest({
+            user: {id: 3}
+        })
+        const res = createResponse()
+        ;(Budget.findAll as jest.Mock).mockRejectedValue(new Error)
+        await BudgetController.getAll(req, res)
+        expect(res.statusCode).toBe(500)
+        expect(res._getJSONData()).toEqual({error: 'Hubo un error'})
     })
 })
