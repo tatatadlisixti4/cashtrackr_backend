@@ -4,7 +4,8 @@ import {BudgetController} from '../../controllers/BudgetController'
 import Budget from '../../models/Budget'
 
 jest.mock('../../models/Budget', () => ({
-    findAll: jest.fn()
+    findAll: jest.fn(),
+    create: jest.fn()
 }))
 
 describe('BudgetController.getAll', () => {
@@ -18,6 +19,8 @@ describe('BudgetController.getAll', () => {
 
     it('should retrive 2 budgets for user with ID 1', async() => {
         const req = createRequest({
+            method: 'GET',
+            url: '/api/budgets',
             user: {id: 1}
         })
         const res = createResponse()
@@ -30,6 +33,8 @@ describe('BudgetController.getAll', () => {
 
     it('should retrive 1 budget for user with ID 2', async() => {
         const req = createRequest({
+            method: 'GET',
+            url: '/api/budgets',
             user: {id: 2}
         })
         const res = createResponse()
@@ -39,9 +44,11 @@ describe('BudgetController.getAll', () => {
         expect(res.statusCode).toBe(200)
         expect(res.statusCode).not.toBe(404)
     })
-    
+
     it('should handle errors when fetching budgets', async() => {
         const req = createRequest({
+            method: 'GET',
+            url: '/api/budgets',
             user: {id: 3}
         })
         const res = createResponse()
@@ -49,5 +56,31 @@ describe('BudgetController.getAll', () => {
         await BudgetController.getAll(req, res)
         expect(res.statusCode).toBe(500)
         expect(res._getJSONData()).toEqual({error: 'Hubo un error'})
+    })
+})
+
+describe('BudgetController.create',  () => {
+    it('Should create a new budget and respond with statusCode 201', async() => {
+        const mockBudget = {
+            save: jest.fn().mockResolvedValue(true)
+        }
+        const req = createRequest({
+            method: 'GET',
+            url: '/api/budgets',
+            user: {id: 1},
+            body: {
+                name: 'Iphone 16 Pro',
+                amount: 1229990
+            }
+        })
+        const res = createResponse()
+        ;(Budget.create as jest.Mock).mockResolvedValue(mockBudget)
+        await BudgetController.create(req, res)
+        const data  = res._getJSONData()
+        expect(res.statusCode).toBe(201)
+        expect(data).toBe('Presupuesto creado correctamente') 
+        expect(mockBudget.save).toHaveBeenCalled()
+        expect(mockBudget.save).toHaveBeenCalledTimes(1)
+        expect(Budget.create).toHaveBeenCalledWith(req.body)
     })
 })
