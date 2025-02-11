@@ -64,6 +64,7 @@ describe('BudgetController.create',  () => {
         const mockBudget = {
             save: jest.fn().mockResolvedValue(true)
         }
+        ;(Budget.create as jest.Mock).mockResolvedValue(mockBudget)
         const req = createRequest({
             method: 'GET',
             url: '/api/budgets',
@@ -74,13 +75,35 @@ describe('BudgetController.create',  () => {
             }
         })
         const res = createResponse()
-        ;(Budget.create as jest.Mock).mockResolvedValue(mockBudget)
         await BudgetController.create(req, res)
         const data  = res._getJSONData()
         expect(res.statusCode).toBe(201)
         expect(data).toBe('Presupuesto creado correctamente') 
         expect(mockBudget.save).toHaveBeenCalled()
         expect(mockBudget.save).toHaveBeenCalledTimes(1)
+        expect(Budget.create).toHaveBeenCalledWith(req.body)
+    })
+
+    it('Should handle budget creation error', async() => {
+        const mockBudget = {
+            save: jest.fn()
+        }
+        ;(Budget.create as jest.Mock).mockRejectedValue(new Error)
+        const req = createRequest({
+            method: 'GET',
+            url: '/api/budgets',
+            user: {id: 1},
+            body: {
+                name: 'Iphone 16 Pro',
+                amount: 1229990
+            }
+        })
+        const res = createResponse()
+        await BudgetController.create(req, res)
+        const data  = res._getJSONData()
+        expect(res.statusCode).toBe(500)
+        expect(data).toEqual({error: 'Hubo un errorsinho'})
+        expect(mockBudget.save).not.toHaveBeenCalled()
         expect(Budget.create).toHaveBeenCalledWith(req.body)
     })
 })
