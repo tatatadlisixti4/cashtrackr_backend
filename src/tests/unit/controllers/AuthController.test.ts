@@ -4,10 +4,12 @@ import User from "../../../models/User"
 import {checkPassword, hashPassword} from "../../../utils/auth"
 import {generateToken} from "../../../utils/token"
 import {AuthEmail} from "../../../emails/AuthEmail"
+import {generateJWT} from "../../../utils/jwt"
 
 jest.mock('../../../models/User')
 jest.mock('../../../utils/auth')
 jest.mock('../../../utils/token')
+jest.mock('../../../utils/jwt')
 
 describe('AuthController.createAccount', () => {
     beforeEach(() => {
@@ -142,5 +144,34 @@ describe('AuthController.login', () => {
         expect(data).toHaveProperty('error', 'Password incorrecto')
         expect(checkPassword).toHaveBeenCalledWith(req.body.password, mockUser.password) 
         expect(checkPassword).toHaveBeenCalledTimes(1) 
+    })
+
+    it('should return a JWT if authentication is successfull', async () => {
+        const mockUser = {
+            id: 1,
+            email: 'test@test.com',
+            password: '123456789',
+            confirmed: true
+        }
+        const req = createRequest({
+            method: 'POST',
+            url: '/api/auth/login', 
+            body: {
+                email: 'test@test.com',
+                password: '123456789'
+            }
+        })
+        const res = createResponse()
+        const testJwt = 'test_jwt';
+        (User.findOne as jest.Mock).mockResolvedValue(mockUser);
+        (checkPassword as jest.Mock).mockResolvedValue(true);
+        (generateJWT as jest.Mock).mockReturnValue(testJwt)
+        await AuthController.login(req, res)
+        const data = res._getJSONData()
+        
+        expect(generateJWT).toHaveBeenCalledTimes(1)
+        expect(generateJWT).toHaveBeenCalledWith(mockUser.id)
+        expect(res.statusCode).toBe(200)
+        expect(data).toBe(testJwt)
     })
 })
