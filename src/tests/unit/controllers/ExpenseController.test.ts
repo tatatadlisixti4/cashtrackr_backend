@@ -85,7 +85,7 @@ describe('ExpenseController.updateById', () => {
 })
 
 describe('ExpenseController.deleteById', () => {
-    it('should delete expense with ID 1', async () => {
+    it('should delete expense with ID 1 and return a success status code', async () => {
         const mockExpense = {
             ...expenses[0],
             destroy: jest.fn().mockResolvedValue(true)
