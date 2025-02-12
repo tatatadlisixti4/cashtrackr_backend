@@ -1,6 +1,8 @@
 import {createRequest, createResponse} from 'node-mocks-http'
 import Expense from '../../../models/Expense'
-import { ExpensesController } from '../../../controllers/ExpenseController'
+import {ExpensesController} from '../../../controllers/ExpenseController'
+import {expenses} from '../../mocks/expenses'
+
 jest.mock('../../../models/Expense', () => ({
     create: jest.fn()
 }))
@@ -41,5 +43,20 @@ describe('ExpensesController.create', () => {
             ...req.body,
             budgetId: req.budget.id
         })
+    })
+})
+
+describe('ExpenseController.getById', () => {
+    it('should return expense with ID 1', async () => {
+        const req = createRequest({
+            method: 'POST',
+            url: '/api/budgets/:budgetId/expenses/:expenseId',
+            expense: expenses[0]
+        })
+        const res = createResponse()
+        await ExpensesController.getById(req, res)
+        const data = res._getJSONData()
+        expect(res.statusCode).toBe(200)
+        expect(data).toEqual(expenses[0])
     })
 })
