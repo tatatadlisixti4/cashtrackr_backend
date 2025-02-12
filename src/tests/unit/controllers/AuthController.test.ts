@@ -70,3 +70,49 @@ describe('AuthController.createAccount', () => {
         expect(res.statusCode).toBe(201)
     })
 })
+
+describe('AuthController.login', () => {
+    beforeEach(() => {
+        jest.resetAllMocks()
+    })
+    it('should return 404 if user is not found', async () => {
+        (User.findOne as jest.Mock).mockResolvedValue(null)
+
+        const req = createRequest({
+            method: 'POST',
+            url: '/api/auth/login', 
+            body: {
+                email: 'test@test.com',
+                password: '123456789'
+            }
+        })
+        const res = createResponse()
+        await AuthController.login(req, res)
+        const data = res._getJSONData()
+        expect(res.statusCode).toBe(404)
+        expect(data).toHaveProperty('error', 'Usuario no existe')
+    })
+
+    it('should return 403 if user account is not confirmed', async () => {
+        (User.findOne as jest.Mock).mockResolvedValue({
+            id: 1,
+            email: 'test@test.com',
+            password: '123456789',
+            confirmed: false
+        })
+
+        const req = createRequest({
+            method: 'POST',
+            url: '/api/auth/login', 
+            body: {
+                email: 'test@test.com',
+                password: '123456789'
+            }
+        })
+        const res = createResponse()
+        await AuthController.login(req, res)
+        const data = res._getJSONData()
+        expect(res.statusCode).toBe(403)
+        expect(data).toHaveProperty('error', 'La cuenta no ha sido confirmada')
+    })
+})
