@@ -24,7 +24,7 @@ describe('Budget Middleware - validateBudgetExists', () => {
         expect(next).not.toHaveBeenCalled()
     })
 
-    it('should handle non-existent budget 2', async () => {
+    it('should handle internal server error', async () => {
         (Budget.findByPk as jest.Mock).mockRejectedValue(new Error)
         const req = createRequest({
             params: {
