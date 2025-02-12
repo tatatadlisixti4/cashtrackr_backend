@@ -56,6 +56,17 @@ describe('AuthController.createAccount', () => {
         (User.create as jest.Mock).mockResolvedValue(mockUser);
         jest.spyOn(AuthEmail, 'sendConfirmationEmail').mockImplementation(() => Promise.resolve())
         await AuthController.createAccount(req, res)
+
+        expect(User.create).toHaveBeenCalledTimes(1)
+        expect(User.create).toHaveBeenCalledWith(mockUser) 
+        expect(mockUser.password).toBe('123456789') 
+        expect(mockUser.token).toBe('123456') 
+        expect(AuthEmail.sendConfirmationEmail).toHaveBeenCalledWith({
+            name: req.body.name,
+            email: req.body.email,
+            token: mockUser.token
+        })
+        expect(AuthEmail.sendConfirmationEmail).toHaveBeenCalledTimes(1)
         expect(res.statusCode).toBe(201)
     })
 })
