@@ -4,13 +4,13 @@ import Expense from '../models/Expense'
 export class ExpensesController {
     static create = async (req: Request, res: Response) => {
         try {
-            const expense = Expense.create({
+            const expense = await Expense.create({
                 ...req.body,
                 budgetId: req.budget.id
             })
             res.status(201).json('Gasto agregado correctamente')
         } catch (error) {
-            res.status(500).json({error: 'Hubo un error'} )
+            res.status(500).json({error: 'Hubo un error'})
         }
     }
 
