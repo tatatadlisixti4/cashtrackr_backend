@@ -3,12 +3,17 @@ import {AuthController} from "../../../controllers/AuthController"
 import User from "../../../models/User"
 import {hashPassword} from "../../../utils/auth"
 import {generateToken} from "../../../utils/token"
+import {AuthEmail} from "../../../emails/AuthEmail"
 
 jest.mock('../../../models/User')
 jest.mock('../../../utils/auth')
 jest.mock('../../../utils/token')
 
 describe('AuthController.createAccount', () => {
+    beforeEach(() => {
+        jest.resetAllMocks();
+        //(User.findOne as jest.Mock).mockReset()
+    })
     it('should return a 409 status and an error message if the email is already  registered', async () => {
         (User.findOne as jest.Mock).mockResolvedValue(true)
         const req = createRequest({
@@ -37,7 +42,8 @@ describe('AuthController.createAccount', () => {
             url: '/api/auth/create-account', 
             body: {
                 email: 'test@test.com',
-                password: '123456789'
+                password: '123456789',
+                name: 'Thadli Guerra'
             }
         })
         const res = createResponse()
@@ -48,7 +54,8 @@ describe('AuthController.createAccount', () => {
         };
         (User.findOne as jest.Mock).mockResolvedValue(null);
         (User.create as jest.Mock).mockResolvedValue(mockUser);
+        jest.spyOn(AuthEmail, 'sendConfirmationEmail').mockImplementation(() => Promise.resolve())
         await AuthController.createAccount(req, res)
+        expect(res.statusCode).toBe(201)
     })
-        
 })

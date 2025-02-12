@@ -25,7 +25,7 @@ export class AuthController {
                 email: user.email,
                 token: user.token
             })
-            res.json('Usuario creado con éxito')
+            res.status(201).json('Usuario creado con éxito')
         } catch (error) {
             res.status(500).json({error: 'Hubo un error'})
         }
