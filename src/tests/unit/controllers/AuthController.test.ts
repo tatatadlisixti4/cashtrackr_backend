@@ -1,7 +1,7 @@
 import {createRequest, createResponse} from "node-mocks-http"
 import {AuthController} from "../../../controllers/AuthController"
 import User from "../../../models/User"
-import {hashPassword} from "../../../utils/auth"
+import {checkPassword, hashPassword} from "../../../utils/auth"
 import {generateToken} from "../../../utils/token"
 import {AuthEmail} from "../../../emails/AuthEmail"
 
@@ -114,5 +114,33 @@ describe('AuthController.login', () => {
         const data = res._getJSONData()
         expect(res.statusCode).toBe(403)
         expect(data).toHaveProperty('error', 'La cuenta no ha sido confirmada')
+    })
+
+    it('should return 401 if user password is incorrect', async () => {
+        const mockUser = {
+            id: 1,
+            email: 'test@test.com',
+            password: '123456789',
+            confirmed: true
+        };
+        (User.findOne as jest.Mock).mockResolvedValue(mockUser)
+
+        const req = createRequest({
+            method: 'POST',
+            url: '/api/auth/login', 
+            body: {
+                email: 'test@test.com',
+                password: '123456789'
+            }
+        })
+        const res = createResponse();
+        (checkPassword as jest.Mock).mockResolvedValue(false)
+        await AuthController.login(req, res)
+        const data = res._getJSONData()
+        
+        expect(res.statusCode).toBe(401)
+        expect(data).toHaveProperty('error', 'Password incorrecto')
+        expect(checkPassword).toHaveBeenCalledWith(req.body.password, mockUser.password) 
+        expect(checkPassword).toHaveBeenCalledTimes(1) 
     })
 })

@@ -61,7 +61,7 @@ export class AuthController {
         const isPasswordCorrect =  await checkPassword(password, user.password)
         if(!isPasswordCorrect) {
             const error = new Error('Password incorrecto')
-            res.status(404).json({error: error.message})
+            res.status(401).json({error: error.message})
             return
         }
         const token = generateJWT(user.id)
