@@ -2,6 +2,8 @@ import {createRequest, createResponse} from "node-mocks-http"
 import {validateExpenseExists} from "../../../middleware/expense"
 import Expense from "../../../models/Expense"
 import {expenses} from "../../mocks/expenses"
+import { budgets } from "../../mocks/budgets"
+import { hasAccess } from "../../../middleware/budget"
 
 jest.mock('../../../models/Expense', () => ({
     findByPk: jest.fn() 
@@ -57,5 +59,22 @@ describe('Expenses Middleware - validateExpenseExists', () => {
         expect(next).not.toHaveBeenCalled()
         expect(res.statusCode).toBe(500)
         expect(data).toEqual({error: 'Hubo un error'})
+    })
+
+    it('should prevent unauthorized users from adding expenses', async () => {
+        const req = createRequest({
+            method: 'POST',
+            url: '/api/budgets/:budgetId/expenses',
+            budget: budgets[0],
+            user: {id: 20},
+            body: {name: 'Expense Test', amoun: 777}
+        })
+        const res = createResponse()
+        const next = jest.fn()
+        hasAccess(req, res, next)
+        const data = res._getJSONData()
+        expect(res.statusCode).toBe(401)
+        expect(data).toEqual({error: 'Acción no válida para este usuario'})
+        expect(next).not.toHaveBeenCalled()
     })
 })
