@@ -56,7 +56,7 @@ describe('Budget Middleware - validateBudgetExists', () => {
     })
 })
 
-describe('Budget Middleware - validateBudgetExists', () => {
+describe('Budget Middleware - hasAccess', () => {
     it('should call next() if user has access to budget', () => {
         const req = createRequest({
             budget: budgets[0],
@@ -68,5 +68,18 @@ describe('Budget Middleware - validateBudgetExists', () => {
         hasAccess(req, res, next)
         expect(next).toHaveBeenCalled()
         expect(next).toHaveBeenCalledTimes(1)
+    })
+
+    it('should return 401 error if userId isnt the same as budget.userId', () => {
+        const req = createRequest({
+            budget: {userId: 1},
+            user: {id: 2}
+        })
+        const res = createResponse()
+        const next = jest.fn()
+        hasAccess(req, res, next)
+        expect(res.statusCode).toBe(401)
+        expect(res._getJSONData()).toEqual({error: 'Acción no válida para este usuario'})
+        expect(next).not.toHaveBeenCalled()
     })
 }) 
