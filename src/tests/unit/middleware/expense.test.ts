@@ -9,13 +9,12 @@ jest.mock('../../../models/Expense', () => ({
 
 describe('Expenses Middleware - validateExpenseExists', () => {
     it('should handle a non-existent expense', async () => {
-        //(Expense.findByPk as jest.Mock).mockResolvedValue(null)
         (Expense.findByPk as jest.Mock).mockImplementation(id => {
             const expense = expenses.filter(e => e.id === id)[0] ?? null
             return Promise.resolve(expense)
         })
         const req = createRequest({
-            params: {expenseId: 1}
+            params: {expenseId: 4}
         })
         const res = createResponse()
         const next = jest.fn()
@@ -28,5 +27,18 @@ describe('Expenses Middleware - validateExpenseExists', () => {
         expect(Expense.findByPk).toHaveBeenCalledTimes(1)
         expect(Expense.findByPk).toHaveBeenCalledWith(req.params.expenseId)
         expect(next).not.toHaveBeenCalled()
+    })
+    it('should call next middleware if expense exists', async () => {
+        const req = createRequest({
+            params: {expenseId: 1}
+        })
+        const res = createResponse()
+        const next = jest.fn()
+        await validateExpenseExists(req, res, next)
+
+        expect(res.statusCode).toBe(200)
+        expect(next).toHaveBeenCalled()
+        expect(next).toHaveBeenCalledTimes(1)
+        expect(req.expense).toEqual(expenses[0])
     })
 })
