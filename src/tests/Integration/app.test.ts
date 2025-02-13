@@ -6,7 +6,7 @@ const app = server()
 describe('Authentication - Create Account', () => {
     beforeAll(async () => { 
         await connectDB()
-    }, 12000)
+    })
 
     afterAll (async () => {
         await disconnectDB()
@@ -59,7 +59,7 @@ describe('Authentication - Create Account', () => {
         expect(createAccountMock).not.toHaveBeenCalled()
     })
 
-    it('should return 201 status code and create an user in de database', async () => {
+    it('should return 201 status code and create an user in the database', async () => {
         const mockUserData = {
             "name": "Thadli",
             "password": "12345678",
@@ -69,8 +69,25 @@ describe('Authentication - Create Account', () => {
             .post('/api/auth/create-account')
             .send(mockUserData)
         expect(response.status).toBe(201)
-        expect(response.text).toBe('Usuario creado con éxito')
+        expect(response.body).toBe('Usuario creado con éxito')
         expect(response.body).not.toHaveProperty('errors')
         expect(response.status).not.toBe(400)
+    })
+
+    it('should return 409 conflict when a user is already registered', async () => {
+        const mockUserData = {
+            "name": "Thadli",
+            "password": "12345678",
+            "email": "test@test.com"
+        }
+        const response = await request(app)
+            .post('/api/auth/create-account')
+            .send(mockUserData)
+
+        expect(response.status).toBe(409)
+        expect(response.body).toHaveProperty('error', 'El usuario ya existe')
+        expect(response.status).not.toBe(400)
+        expect(response.status).not.toBe(201)
+        expect(response.body).not.toHaveProperty('errors')
     })
 })
