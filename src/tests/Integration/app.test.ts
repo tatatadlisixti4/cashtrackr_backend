@@ -61,9 +61,9 @@ describe('Authentication - Create Account', () => {
 
     it('should return 201 status code and create an user in de database', async () => {
         const mockUserData = {
-            "name": "Maria",
+            "name": "Thadli",
             "password": "12345678",
-            "email": "test2@test.com"
+            "email": "test@test.com"
         }
         const response = await request(app)
             .post('/api/auth/create-account')
