@@ -6,24 +6,39 @@ import budgetRouter from './routes/budgetRouter'
 import authRouter from './routes/authRouter'
 import {limiter} from './config/limiter'
 
-async function connectDB() {
+/** Creación y configuración del servidor */
+export function server() {
+    const app = express()
+
+    // Middlewares
+    app.use(morgan('dev'))
+    app.use(express.json())
+    app.use(limiter)
+
+    // Rutas
+    app.use('/api/budgets', budgetRouter)
+    app.use('/api/auth', authRouter)
+
+    // Ruta para el integration testing
+    app.get('/', (req, res) => {
+        res.send('Todo bien...')
+    })
+    return app
+}
+
+/** Conexión DB e inicio del servidor */
+export async function connectDB() {
     try {
         await db.authenticate()
-        db.sync()
+        await db.sync()
         console.log(colors.blue.bold('Conexión exitosa a la BD'))
+        
     } catch (error) {
         console.log(colors.red.bold('Falló la conexión a la BD'))
+        process.exit(1)
     }
 }
-connectDB()
-const app = express()
 
-app.use(morgan('dev'))
-app.use(express.json())
-
-app.use(limiter)
-
-app.use('/api/budgets', budgetRouter)
-app.use('/api/auth', authRouter)
-
-export default app
+export async function disconnectDB() {
+    await db.close()
+}
