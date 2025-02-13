@@ -23,9 +23,9 @@ export function server() {
     app.get('/', (req, res) => {
         res.send('Todo bien...')
     })
-
-    console.log(process.env.NODE_ENV)
-    // return app
+    
+    // console.log(process.env.NODE_ENV)
+    return app
 }
 
 /** Conexión DB e inicio del servidor */
