@@ -1,19 +1,25 @@
 import request from 'supertest'
 import {server, connectDB, disconnectDB} from '../../server'
 
-describe('Test', () => {
+const app = server()
+
+describe('Authentication - Create Account', () => {
     beforeAll(async () => { 
         await connectDB()
-    }, 10000)
+    }, 12000)
 
     afterAll (async () => {
         await disconnectDB()
     })
+    
+    it('should dispĺay validation errors when form is empty', async () => {
+        const response = await request(app)
+            .post('/api/auth/create-account')
+            .send({})
 
-    it('should return a 200 status code from the homepage url', async () => {
-        const app = server()
-        const response = await request(app).get('/')
-        expect(response.statusCode).toBe(200)
-        expect(response.text).toBe('Todo bien...')
+        expect(response.status).toBe(400)
+        expect(response.body).toHaveProperty('errors')
+        expect(response.body.errors).toHaveLength(3)
+        expect(response.status).not.toBe(201)
     })
 })
