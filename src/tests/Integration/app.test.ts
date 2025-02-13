@@ -3,7 +3,7 @@ import {server, connectDB, disconnectDB} from '../../server'
 import {AuthController} from '../../controllers/AuthController'
 const app = server()
 
-describe('Authentication - Create Account', () => {
+describe('Authentication - Create account', () => {
     beforeAll(async () => { 
         await connectDB()
     })
@@ -89,5 +89,18 @@ describe('Authentication - Create Account', () => {
         expect(response.status).not.toBe(400)
         expect(response.status).not.toBe(201)
         expect(response.body).not.toHaveProperty('errors')
+    })
+})
+
+describe('Authentication - Account confirmation with token', () => {
+    it('should display error if token is empty or is not valid', async () => {
+        const response = await request(app)
+            .post('/api/auth/confirm-account')
+            .send({
+                token: "notToken"
+            })
+        expect(response.status).toBe(400)
+        expect(response.body).toHaveProperty('errors')
+        expect(response.body.errors).toHaveLength(1)
     })
 })
