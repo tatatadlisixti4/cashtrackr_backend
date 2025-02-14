@@ -1,6 +1,7 @@
 import request from 'supertest'
 import {server, connectDB, disconnectDB} from '../../server'
 import {AuthController} from '../../controllers/AuthController'
+import User from '../../models/User'
 const app = server()
 
 beforeAll(async () => { 
@@ -150,7 +151,7 @@ describe('Authentication - Login', () => {
             .post('/api/auth/login')
             .send({
                 "email": "notEmail",
-                "password": "123456"
+                "password": "12345678"
             })
             
         const next = jest.fn()
@@ -163,5 +164,42 @@ describe('Authentication - Login', () => {
         expect(next).not.toHaveBeenCalled()
         expect(LoginMock).not.toHaveBeenCalled()
         expect(response.body.errors).not.toHaveLength(2)
+    })
+    
+    it('should return 404 error if the user is not found', async () => {
+        const response = await request(app)
+            .post('/api/auth/login')
+            .send({
+                "email": "user_not_found@test.com",
+                "password": "12345678"
+            })
+        
+        expect(response.status).toBe(404)
+        expect(response.body).toHaveProperty('error')
+        expect(response.body.error).toBe('Usuario no existe')
+        expect(response.status).not.toBe(200)
+    })
+
+    it('should return 403 error if the user account is not confirmed', async () => {
+        const findUserMock = jest.spyOn(User, 'findOne');
+        (findUserMock as jest.Mock).mockResolvedValue({
+            id: 1,
+            confirmed: false,
+            email: "user_not_confirmed@test.com",
+            password: "12345678"
+        });
+
+        const response = await request(app)
+            .post('/api/auth/login')
+            .send({
+                "email": "user_not_confirmed@test.com",
+                "password": "12345678"
+            })
+        
+        expect(response.status).toBe(403)
+        expect(response.body).toHaveProperty('error')
+        expect(response.body.error).toBe('La cuenta no ha sido confirmada')
+        expect(response.status).not.toBe(404)
+        expect(response.status).not.toBe(200)
     })
 })
