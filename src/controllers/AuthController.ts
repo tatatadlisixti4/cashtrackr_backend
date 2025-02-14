@@ -15,10 +15,14 @@ export class AuthController {
             return
         }
         try {
+            const token = generateToken()
+            if(process.env.NODE_ENV !== 'production') {
+                globalThis.confirmationToken = token
+            }
             const user = await User.create({
                 ...req.body, 
                 password: await hashPassword(password),
-                token: generateToken()
+                token
             })
             await AuthEmail.sendConfirmationEmail({
                 name: user.name,
@@ -42,7 +46,7 @@ export class AuthController {
         user.confirmed = true 
         user.token = null
         await user.save()
-        res.json("Cuenta confirmada correctamente")
+        res.json('Cuenta confirmada correctamente')
     }
 
     static login = async (req: Request, res: Response) => {

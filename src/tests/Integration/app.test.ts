@@ -116,4 +116,15 @@ describe('Authentication - Account confirmation with token', () => {
         expect(response.body.error).toBe('Token no válido')
         expect(response.status).not.toBe(200)
     })
+
+    it('should confirm account with a valid token', async () => {
+        const token = globalThis.confirmationToken
+        const response = await request(app)
+        .post('/api/auth/confirm-account')
+        .send({token})
+
+        expect(response.status).toBe(200)
+        expect(response.body).toBe('Cuenta confirmada correctamente')
+        expect(response.status).not.toBe(401)
+    })
 })     
