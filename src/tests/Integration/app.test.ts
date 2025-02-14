@@ -3,6 +3,8 @@ import {server, connectDB, disconnectDB} from '../../server'
 import {AuthController} from '../../controllers/AuthController'
 import User from '../../models/User'
 import * as authPassword from '../../utils/auth'
+import * as jwt from '../../utils/jwt'
+
 const app = server()
 
 beforeAll(async () => { 
@@ -254,6 +256,37 @@ describe('Authentication - Login', () => {
         expect(response.status).not.toBe(404)
         expect(response.status).not.toBe(403)
         expect(response.status).not.toBe(200)
+
+        findUserMock.mockRestore()
+        checkPasswordMock.mockRestore()
+    })
+
+    it('should return 200 statuscode after create the jwt', async () => {
+        const findUserMock = jest.spyOn(User, 'findOne');
+        (findUserMock as jest.Mock).mockResolvedValue({
+            id: 1,
+            confirmed: true,
+            email: "test@test.com",
+            password: "hashedPassword"
+        });
+        const checkPasswordMock = jest.spyOn(authPassword, 'checkPassword'); 
+        (checkPasswordMock as jest.Mock).mockResolvedValue(true);
+        const jwtMock = jest.spyOn(jwt, 'generateJWT');
+        (jwtMock as jest.Mock).mockReturnValue('jwt_token')
+
+        const response = await request(app)
+            .post('/api/auth/login')
+            .send({
+                "email": "test@test.com",
+                "password": "correctPassword"
+            })
+
+        expect(response.status).toBe(200)
+        expect(response.body).toBe('jwt_token')
+        expect(checkPasswordMock).toHaveBeenCalledTimes(1)
+        expect(checkPasswordMock).toHaveBeenCalledWith('correctPassword', 'hashedPassword')
+        expect(jwtMock).toHaveBeenCalledTimes(1)
+        expect(jwtMock).toHaveBeenCalledWith(1)
 
         findUserMock.mockRestore()
         checkPasswordMock.mockRestore()
