@@ -19,17 +19,21 @@ router.param('expenseId', validateExpenseExists)
 
 /** Routes for budget */
 router.get('/', BudgetController.getAll)
+
 router.post('/', 
     validateBudgetInput,
     handleInputErrors,
     BudgetController.create
 )
+
 router.get('/:budgetId', BudgetController.getById)
+
 router.put('/:budgetId',
     validateBudgetInput,  
     handleInputErrors,
     BudgetController.updateById
 )
+
 router.delete('/:budgetId', BudgetController.deleteById)
 
 /** Router for expenses */
@@ -38,12 +42,15 @@ router.post('/:budgetId/expenses',
     handleInputErrors,
     ExpensesController.create
 )
+
 router.get('/:budgetId/expenses/:expenseId', ExpensesController.getById)
+
 router.put('/:budgetId/expenses/:expenseId', 
     validateExpenseInput,
     handleInputErrors,
     ExpensesController.updateById
 )
+
 router.delete('/:budgetId/expenses/:expenseId', ExpensesController.deleteById)
 
 export default router

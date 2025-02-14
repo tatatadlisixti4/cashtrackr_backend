@@ -292,3 +292,13 @@ describe('Authentication - Login', () => {
         checkPasswordMock.mockRestore()
     })
 })
+
+describe('GET /api/budgets', () => {
+    it('should reject unauthenticated acess to budgets without a jwt', async () => {
+        const response = await request(app)
+            .get('/api/budgets')
+            
+        expect(response.status).toBe(401)
+        expect(response.body).toHaveProperty('error', 'No autorizado')
+    })
+})
