@@ -142,5 +142,26 @@ describe('Authentication - Login', () => {
         expect(response.body.errors).toHaveLength(2)
         expect(next).not.toHaveBeenCalled()
         expect(LoginMock).not.toHaveBeenCalled()
+        expect(response.body.errors).not.toHaveLength(1)
+    })
+    
+    it('should return 400 bad request when the email is invalid', async () => {
+        const response = await request(app)
+            .post('/api/auth/login')
+            .send({
+                "email": "notEmail",
+                "password": "123456"
+            })
+            
+        const next = jest.fn()
+        const LoginMock = jest.spyOn(AuthController, 'login')
+
+        expect(response.status).toBe(400)
+        expect(response.body).toHaveProperty('errors')
+        expect(response.body.errors).toHaveLength(1)
+        expect(response.body.errors[0].msg).toBe('Email no válido')
+        expect(next).not.toHaveBeenCalled()
+        expect(LoginMock).not.toHaveBeenCalled()
+        expect(response.body.errors).not.toHaveLength(2)
     })
 })
