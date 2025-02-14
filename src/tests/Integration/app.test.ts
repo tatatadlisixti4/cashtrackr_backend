@@ -2,6 +2,7 @@ import request from 'supertest'
 import {server, connectDB, disconnectDB} from '../../server'
 import {AuthController} from '../../controllers/AuthController'
 import User from '../../models/User'
+import * as authPassword from '../../utils/auth'
 const app = server()
 
 beforeAll(async () => { 
@@ -225,5 +226,36 @@ describe('Authentication - Login', () => {
         expect(response.body.error).toBe('La cuenta no ha sido confirmada')
         expect(response.status).not.toBe(404)
         expect(response.status).not.toBe(200)
+    })
+
+    it('should return 401 error if user the password is invalid', async () => {
+        const findUserMock = jest.spyOn(User, 'findOne');
+        (findUserMock as jest.Mock).mockResolvedValue({
+            id: 1,
+            confirmed: true,
+            email: "test@test.com",
+            password: "hashedPassword"
+        });
+        const checkPasswordMock = jest.spyOn(authPassword, 'checkPassword'); 
+        (checkPasswordMock as jest.Mock).mockResolvedValue(false);
+
+        const response = await request(app)
+            .post('/api/auth/login')
+            .send({
+                "email": "test@test.com",
+                "password": "wrongPassword"
+            })
+        
+        expect(findUserMock).toHaveBeenCalledTimes(1)
+        expect(checkPasswordMock).toHaveBeenCalledTimes(1)
+        expect(response.status).toBe(401)
+        expect(response.body).toHaveProperty('error')
+        expect(response.body.error).toBe('Password incorrecto')
+        expect(response.status).not.toBe(404)
+        expect(response.status).not.toBe(403)
+        expect(response.status).not.toBe(200)
+
+        findUserMock.mockRestore()
+        checkPasswordMock.mockRestore()
     })
 })
