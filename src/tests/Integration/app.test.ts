@@ -361,4 +361,25 @@ describe('POST /api/budgets', () => {
         expect(response.status).toBe(400)
         expect(response.body.errors).toHaveLength(4)
     })
+
+    it('should create a new budget and return a success message', async () => {
+        const response = await request(app)
+            .post('/api/budgets')
+            .auth(jwt, {type: 'bearer'})
+            .send({
+                "name": "Test Budget",
+                "amount": 4000
+            })
+    })
 })
+
+describe('GET /api/budgets/:id', () => {
+    it('should reject unauthenticated get request to budget id without a jwt', async () => {
+        const response = await request(app)
+            .post('/api/budgets/1')
+        expect(response.status).toBe(401)
+        expect(response.body.error).toBe('No autorizado')
+    })
+})
+
+
