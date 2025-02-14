@@ -201,5 +201,29 @@ describe('Authentication - Login', () => {
         expect(response.body.error).toBe('La cuenta no ha sido confirmada')
         expect(response.status).not.toBe(404)
         expect(response.status).not.toBe(200)
+
+        findUserMock.mockRestore()
+    })
+
+    it('should return 403 error if the user account is not confirmed method 2', async () => {
+        const userData = {
+            name: "Test",
+            email: "user_not_confirmed@test.com",
+            password: "12345678"
+        }
+        await request(app).post('/api/auth/create-account').send(userData)
+
+        const response = await request(app)
+            .post('/api/auth/login')
+            .send({
+                "email": userData.email,
+                "password": userData.password
+            })
+        
+        expect(response.status).toBe(403)
+        expect(response.body).toHaveProperty('error')
+        expect(response.body.error).toBe('La cuenta no ha sido confirmada')
+        expect(response.status).not.toBe(404)
+        expect(response.status).not.toBe(200)
     })
 })
