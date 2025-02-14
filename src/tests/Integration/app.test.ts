@@ -3,15 +3,15 @@ import {server, connectDB, disconnectDB} from '../../server'
 import {AuthController} from '../../controllers/AuthController'
 const app = server()
 
-describe('Authentication - Create account', () => {
-    beforeAll(async () => { 
-        await connectDB()
-    })
+beforeAll(async () => { 
+    await connectDB()
+})
 
-    afterAll (async () => {
-        await disconnectDB()
-    })
-    
+afterAll (async () => {
+    await disconnectDB()
+})
+
+describe('Authentication - Create account', () => {
     it('should display validation errors when form is empty', async () => {
         const response = await request(app)
             .post('/api/auth/create-account')
@@ -102,5 +102,18 @@ describe('Authentication - Account confirmation with token', () => {
         expect(response.status).toBe(400)
         expect(response.body).toHaveProperty('errors')
         expect(response.body.errors).toHaveLength(1)
+        expect(response.body.errors[0]['msg']).toBe('Token no válido')
     })
-})
+
+    it('should display error if token doesnt have an user valid', async () => {
+        const response = await request(app)
+            .post('/api/auth/confirm-account')
+            .send({
+                token: "123456"
+            })
+        expect(response.body).toHaveProperty('error')
+        expect(response.status).toBe(401)
+        expect(response.body.error).toBe('Token no válido')
+        expect(response.status).not.toBe(200)
+    })
+})     

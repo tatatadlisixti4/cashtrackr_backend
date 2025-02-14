@@ -23,8 +23,6 @@ export function server() {
     app.get('/', (req, res) => {
         res.send('Todo bien...')
     })
-    
-    // console.log(process.env.NODE_ENV)
     return app
 }
 
@@ -34,10 +32,9 @@ export async function connectDB() {
         await db.authenticate()
         await db.sync()
         console.log(colors.blue.bold('Conexión exitosa a la BD'))
-        
     } catch (error) {
         console.log(colors.red.bold('Falló la conexión a la BD'))
-        process.exit(1)
+        process.exit(1) 
     }
 }
 
