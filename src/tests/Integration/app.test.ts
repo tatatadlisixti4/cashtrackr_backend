@@ -3,7 +3,7 @@ import {server, connectDB, disconnectDB} from '../../server'
 import {AuthController} from '../../controllers/AuthController'
 import User from '../../models/User'
 import * as authPassword from '../../utils/auth'
-import * as jwt from '../../utils/jwt'
+import * as jwtUtils from '../../utils/jwt'
 
 const app = server()
 
@@ -271,7 +271,7 @@ describe('Authentication - Login', () => {
         });
         const checkPasswordMock = jest.spyOn(authPassword, 'checkPassword'); 
         (checkPasswordMock as jest.Mock).mockResolvedValue(true);
-        const jwtMock = jest.spyOn(jwt, 'generateJWT');
+        const jwtMock = jest.spyOn(jwtUtils, 'generateJWT');
         (jwtMock as jest.Mock).mockReturnValue('jwt_token')
 
         const response = await request(app)
@@ -294,20 +294,24 @@ describe('Authentication - Login', () => {
     })
 })
 
+let jwt: string
+async function authenticateUser () {
+    const response = await request(app)
+        .post('/api/auth/login')
+        .send({
+            email: "test@test.com",
+            password: "12345678"
+        })
+    jwt =  response.body
+    expect(response.status).toBe(200)
+}
+
 describe('GET /api/budgets', () => {
-    let jwt: string
-    beforeEach(async () => {
-        const response = await request(app)
-            .post('/api/auth/login')
-            .send({
-                email: "test@test.com",
-                password: "12345678"
-            })
-            jwt =  response.body
-        expect(response.status).toBe(200)
+    beforeAll(async () => {
+        await authenticateUser()
     })
     
-    it('should reject unauthenticated acess to budgets without a jwt', async () => {
+    it('should reject unauthenticated access to budgets without a jwt', async () => {
         const response = await request(app)
             .get('/api/budgets')
             
@@ -332,5 +336,29 @@ describe('GET /api/budgets', () => {
             
         expect(response.status).toBe(500)
         expect(response.body).toHaveProperty('error', 'Token no valido')
+    })
+})
+
+describe('POST /api/budgets', () => {
+    beforeAll(async () => {
+        await authenticateUser()
+    })
+        
+    it('should reject unauthenticated post request to budgets without a jwt', async () => {
+        const response = await request(app)
+            .post('/api/budgets')
+            
+        expect(response.status).toBe(401)
+        expect(response.body).toHaveProperty('error', 'No autorizado')
+    })
+
+    it('should display validation when the form is submitted with invalid data', async () => {
+        const response = await request(app)
+            .post('/api/budgets')
+            .auth(jwt, {type: 'bearer'})
+            .send({})
+            
+        expect(response.status).toBe(400)
+        expect(response.body.errors).toHaveLength(4)
     })
 })
