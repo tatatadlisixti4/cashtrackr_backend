@@ -374,11 +374,28 @@ describe('POST /api/budgets', () => {
 })
 
 describe('GET /api/budgets/:id', () => {
+    beforeAll(async () => {
+        await authenticateUser()
+    })
+    
     it('should reject unauthenticated get request to budget id without a jwt', async () => {
         const response = await request(app)
-            .post('/api/budgets/1')
+            .get('/api/budgets/1')
         expect(response.status).toBe(401)
         expect(response.body.error).toBe('No autorizado')
+    })
+
+    it('should return 400 bad request when id is no valid', async () => {
+        const response = await request(app)
+            .get('/api/budgets/not_valid')
+            .auth(jwt, {type: 'bearer'})
+
+        expect(response.status).toBe(400)
+        expect(response.body.errors).toBeDefined()
+        expect(response.body.errors).toBeTruthy()
+        expect(response.body.errors[0].msg).toBe('ID no válido')
+        expect(response.status).not.toBe(401)
+        expect(response.body.error).not.toBe('No autorizado')
     })
 })
 
