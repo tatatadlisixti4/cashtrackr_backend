@@ -1,4 +1,4 @@
-import {db} from "../config/db"
+import db from "../config/db"
 const clearData = async () => {
     try {
         await db.sync({force: true})

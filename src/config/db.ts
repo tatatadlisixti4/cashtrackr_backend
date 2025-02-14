@@ -15,8 +15,6 @@ if(process.env.NODE_ENV === 'production') {
         }
     })
 } else {
-    console.log('a');
-    
     db = new Sequelize({
         username: process.env.DATABASE_USERNAME,
         password: process.env.DATABASE_PASSWORD,
