@@ -290,10 +290,23 @@ describe('Authentication - Login', () => {
 
         findUserMock.mockRestore()
         checkPasswordMock.mockRestore()
+        jwtMock.mockRestore()
     })
 })
 
 describe('GET /api/budgets', () => {
+    let jwt: string
+    beforeEach(async () => {
+        const response = await request(app)
+            .post('/api/auth/login')
+            .send({
+                email: "test@test.com",
+                password: "12345678"
+            })
+            jwt =  response.body
+        expect(response.status).toBe(200)
+    })
+    
     it('should reject unauthenticated acess to budgets without a jwt', async () => {
         const response = await request(app)
             .get('/api/budgets')
