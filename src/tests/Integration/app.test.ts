@@ -397,6 +397,29 @@ describe('GET /api/budgets/:id', () => {
         expect(response.status).not.toBe(401)
         expect(response.body.error).not.toBe('No autorizado')
     })
+
+    it('should return 404 not found when a budget doesnt exists', async () => {
+        const response = await request(app)
+            .get('/api/budgets/3000')
+            .auth(jwt, {type: 'bearer'})
+
+        expect(response.status).toBe(404)
+        expect(response.body.error).toBe('Presupuesto no existe')
+        expect(response.status).not.toBe(401)
+        expect(response.status).not.toBe(400)
+    })
+    
+    it('should return 200 found when a budget exists', async () => {
+        const response = await request(app)
+            .get('/api/budgets/1')
+            .auth(jwt, {type: 'bearer'})
+
+        expect(response.status).toBe(200)
+        expect(response.status).not.toBe(401)
+        expect(response.status).not.toBe(400)
+        expect(response.status).not.toBe(404)
+
+    })
 })
 
 
