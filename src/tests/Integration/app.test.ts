@@ -314,4 +314,23 @@ describe('GET /api/budgets', () => {
         expect(response.status).toBe(401)
         expect(response.body).toHaveProperty('error', 'No autorizado')
     })
+    
+    it('should allow authenticated access to budgets with a valid jwt', async () => {
+        const response = await request(app)
+            .get('/api/budgets')
+            .auth(jwt, {type: 'bearer'})
+
+        expect(response.body).toHaveLength(0)
+        expect(response.status).not.toBe(401)
+        expect(response.body).not.toHaveProperty('error', 'No autorizado')
+    })
+
+    it('should reject unauthenticated acess to budgets without a valid jwt', async () => {
+        const response = await request(app)
+            .get('/api/budgets')
+            .auth('not_valid_token', {type: 'bearer'})
+            
+        expect(response.status).toBe(500)
+        expect(response.body).toHaveProperty('error', 'Token no valido')
+    })
 })
