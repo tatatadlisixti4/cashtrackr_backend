@@ -422,4 +422,68 @@ describe('GET /api/budgets/:id', () => {
     })
 })
 
+describe('PUT /api/budgets/:id', () => {
+    beforeAll(async () => {
+        await authenticateUser()
+    })
+    
+    it('should reject unauthenticated put request to budget id without a jwt', async () => {
+        const response = await request(app)  
+            .put('/api/budgets/1')
+        expect(response.status).toBe(401)
+        expect(response.body.error).toBe('No autorizado')
+    })
+
+    it('should display validation errors if the form is empty', async () => {
+        const response = await request(app)  
+            .put('/api/budgets/1')
+            .auth(jwt, {type: 'bearer'})
+            .send({})
+        expect(response.status).toBe(400)
+        expect(response.body.errors).toBeTruthy()
+        expect(response.body.errors).toHaveLength(4)
+    })
+
+    it('should update a budget by id and return a success message', async () => {
+        const response = await request(app)  
+            .put('/api/budgets/1')
+            .auth(jwt, {type: 'bearer'})
+            .send({
+                name: "Update Budget",
+                amount: 300
+            })
+        expect(response.status).toBe(200)
+        expect(response.body).toBe('Presupuesto actualizado correctamente')
+    })
+})
+
+describe('DELETE /api/budgets/:id', () => {
+    beforeAll(async () => {
+        await authenticateUser()
+    })
+    
+    it('should reject unauthenticated put request to budget id without a jwt', async () => {
+        const response = await request(app)  
+            .delete('/api/budgets/1')
+        expect(response.status).toBe(401)
+        expect(response.body.error).toBe('No autorizado')
+    })
+
+    it('should return 404 not found when a budget doesnt exists', async () => {
+        const response = await request(app)  
+            .put('/api/budgets/777')
+            .auth(jwt, {type: 'bearer'})
+        expect(response.status).toBe(404)
+        expect(response.body.error).toBe('Presupuesto no existe')
+    })
+
+    it('should delete a budget by id and return a success message', async () => {
+        const response = await request(app)  
+            .delete('/api/budgets/1')
+            .auth(jwt, {type: 'bearer'})
+        expect(response.status).toBe(200)
+        expect(response.body).toBe('Presupuesto eliminado correctamente')
+    })
+})
+
 
