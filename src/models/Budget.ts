@@ -20,6 +20,7 @@ class Budget extends Model {
     declare amount: number
 
     @HasMany(() => Expense, {
+        foreignKey: 'budgetId',
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
     })

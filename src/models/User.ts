@@ -37,6 +37,7 @@ class User extends Model {
     declare confirmed: boolean 
 
     @HasMany(() => Budget, {
+        foreignKey: 'userId',
         onUpdate: 'CASCADE',
         onDelete: 'CASCADE'
     })
