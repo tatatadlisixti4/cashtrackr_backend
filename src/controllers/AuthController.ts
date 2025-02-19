@@ -97,6 +97,7 @@ export class AuthController {
         if(!isTokenCorrect) {
             const error = new Error('Token no válido')
             res.status(404).json({'error': error.message})
+            return
         }
         res.json('Token válido')
     }
