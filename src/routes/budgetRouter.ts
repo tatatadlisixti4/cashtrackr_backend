@@ -32,7 +32,7 @@ router.put('/:budgetId',
     handleInputErrors,
     BudgetController.updateById
 )
-
+    
 router.delete('/:budgetId', BudgetController.deleteById)
 
 /** Router for expenses */
