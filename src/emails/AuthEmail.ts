@@ -9,7 +9,7 @@ type EmailType = {
 export class AuthEmail  {
     static sendConfirmationEmail = async (user: EmailType) => {
         const email = await transport.sendMail({
-            from: 'CashTrackr <admin@cashtrackr.com>',
+            from: `CashTrackr <${process.env.EMAIL_ACCOUNT}`,
             to: user.email,
             subject: 'CashTrackr - Confirma tu cuenta',
             html: `
@@ -22,7 +22,7 @@ export class AuthEmail  {
     } 
     static sendPasswordResetToken = async (user: EmailType) => {
         const email = await transport.sendMail({
-            from: 'CashTrackr <admin@cashtrackr.com>',
+            from: `CashTrackr <${process.env.EMAIL_ACCOUNT}`,
             to: user.email,
             subject: 'CashTrackr - Reestablece tu password',
             html: `
