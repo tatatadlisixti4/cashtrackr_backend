@@ -16,7 +16,7 @@ router.post('/create-account',
         .isLength({min: 8}).withMessage('El password es muy corto, son mínimo 8 caracteres'),
     body('email')
         .isEmail().withMessage('E-mail no válido'),
-        handleInputErrors,
+    handleInputErrors,
     AuthController.createAccount
 )
 
@@ -24,7 +24,7 @@ router.post('/confirm-account',
     body('token')
         //.notEmpty().withMessage('El token no puede ir vacío')
         .isLength({min: 6, max: 6}).withMessage('Token no válido'),
-        handleInputErrors,
+    handleInputErrors,
     AuthController.confirmAccount
 )
 
@@ -67,6 +67,16 @@ router.get('/user',
     AuthController.user
 )
 
+router.put('/user', 
+    authenticate,
+    body('name')
+    .notEmpty().withMessage('El nombre no puede ir vacío'),
+    body('email')
+        .isEmail().withMessage('E-mail no válido'),
+    handleInputErrors,
+    AuthController.updateCurrentUserData
+)
+
 router.post('/update-password', 
     authenticate, 
     body('current_password')
@@ -84,5 +94,6 @@ router.post('/check-password',
     handleInputErrors,
     AuthController.checkPassword
 )
+
 
 export default router

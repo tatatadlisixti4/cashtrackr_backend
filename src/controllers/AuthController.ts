@@ -145,5 +145,19 @@ export class AuthController {
         }
         res.status(200).json('Password validado correctamente')
     }
+
+    static updateCurrentUserData = async (req: Request, res: Response) => {
+        const {name, email} = req.body
+        const isEmailNotAvailable = await User.findOne({where: {email}})
+        if(isEmailNotAvailable) {
+            const error = new Error('Email no disponible')
+            res.status(409).json({error: error.message})
+            return
+        }
+        req.user.name = name
+        req.user.email = email
+        req.user.save()
+        res.status(200).json('Información actualizada')
+    }
 }
 
