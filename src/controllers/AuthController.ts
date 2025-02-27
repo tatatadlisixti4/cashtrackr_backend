@@ -154,6 +154,13 @@ export class AuthController {
             res.status(409).json({error: error.message})
             return
         }
+        // if(isEmailNotAvailable.email !== req.user.email ) {
+        //     if(isEmailNotAvailable) {
+        //         const error = new Error('Email no disponible')
+        //         res.status(409).json({error: error.message})
+        //         return
+        //     }
+        // } 
         req.user.name = name
         req.user.email = email
         req.user.save()
